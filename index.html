@@ -22,12 +22,16 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const today = new Date();
 
-function getColor(start, end) {
+function getColor(mostra, start, end) {
+
+  if (mostra.visitata) return "blue";
+
   const diffDays = (end - today) / (1000 * 60 * 60 * 24);
 
   if (today > end) return "red";
   if (today < start) return "yellow";
   if (diffDays < 10) return "orange";
+
   return "green";
 }
 
@@ -38,7 +42,7 @@ fetch('mostre.json')
       const start = new Date(m.data_inizio);
       const end = new Date(m.data_fine);
 
-      const color = getColor(start, end);
+      const color = getColor(m, start, end);
 
       const marker = L.circleMarker([m.lat, m.lon], {
         radius: 8,

@@ -1,26 +1,110 @@
 [
   {
-    "nome": "Mostra A",
-    "indirizzo": "Dorsoduro 1, Venezia",
-    "lat": 45.431,
-    "lon": 12.328,
-    "data_inizio": "2026-04-01",
-    "data_fine": "2026-05-20"
-  },
-  {
-    "nome": "Mostra B",
-    "indirizzo": "Cannaregio 2000, Venezia",
-    "lat": 45.445,
-    "lon": 12.335,
-    "data_inizio": "2026-05-15",
-    "data_fine": "2026-07-01"
-  },
-  {
-    "nome": "Mostra C",
-    "indirizzo": "San Marco 50, Venezia",
-    "lat": 45.434,
-    "lon": 12.338,
+    "nome": "Anselm Kiefer - Lagune",
+    "indirizzo": "Dorsoduro 2826, Venezia",
+    "lat": 45.4308,
+    "lon": 12.3275,
     "data_inizio": "2026-03-01",
-    "data_fine": "2026-04-15"
+    "data_fine": "2026-04-15",
+    "visitata": false
+  },
+  {
+    "nome": "Marina Abramović - Echoes",
+    "indirizzo": "San Marco 52, Venezia",
+    "lat": 45.4343,
+    "lon": 12.3388,
+    "data_inizio": "2026-04-01",
+    "data_fine": "2026-05-10",
+    "visitata": false
+  },
+  {
+    "nome": "Arte Povera Revisited",
+    "indirizzo": "Cannaregio 3012, Venezia",
+    "lat": 45.4425,
+    "lon": 12.3341,
+    "data_inizio": "2026-04-20",
+    "data_fine": "2026-06-30",
+    "visitata": false
+  },
+  {
+    "nome": "Future Landscapes",
+    "indirizzo": "Castello 2146, Venezia",
+    "lat": 45.4378,
+    "lon": 12.3491,
+    "data_inizio": "2026-06-15",
+    "data_fine": "2026-09-01",
+    "visitata": false
+  },
+  {
+    "nome": "Bill Viola - Water Memories",
+    "indirizzo": "Giudecca 810, Venezia",
+    "lat": 45.4251,
+    "lon": 12.3262,
+    "data_inizio": "2026-02-10",
+    "data_fine": "2026-05-25",
+    "visitata": true
+  },
+  {
+    "nome": "Luc Tuymans - Shadows",
+    "indirizzo": "Santa Croce 1957, Venezia",
+    "lat": 45.4384,
+    "lon": 12.3228,
+    "data_inizio": "2026-01-15",
+    "data_fine": "2026-03-20",
+    "visitata": true
+  },
+  {
+    "nome": "Japanese Avant-Garde",
+    "indirizzo": "Arsenale, Venezia",
+    "lat": 45.4326,
+    "lon": 12.3558,
+    "data_inizio": "2026-05-20",
+    "data_fine": "2026-08-15",
+    "visitata": false
+  },
+  {
+    "nome": "Digital Bodies",
+    "indirizzo": "Mestre Piazza Ferretto, Venezia",
+    "lat": 45.4937,
+    "lon": 12.2422,
+    "data_inizio": "2026-04-28",
+    "data_fine": "2026-05-05",
+    "visitata": false
+  },
+  {
+    "nome": "Venice Experimental Film",
+    "indirizzo": "Lido di Venezia 45, Venezia",
+    "lat": 45.4172,
+    "lon": 12.3693,
+    "data_inizio": "2026-07-01",
+    "data_fine": "2026-07-20",
+    "visitata": false
+  },
+  {
+    "nome": "Minimal Structures",
+    "indirizzo": "Fondamenta Nove, Venezia",
+    "lat": 45.4448,
+    "lon": 12.3402,
+    "data_inizio": "2026-03-15",
+    "data_fine": "2026-05-03",
+    "visitata": false
+  },
+  {
+    "nome": "Sciarrino Visual Scores",
+    "indirizzo": "Zattere 1401, Venezia",
+    "lat": 45.4287,
+    "lon": 12.3269,
+    "data_inizio": "2026-05-01",
+    "data_fine": "2026-06-01",
+    "visitata": true
+  },
+  {
+    "nome": "Bruce Nauman - Corridors",
+    "indirizzo": "Campo Santo Stefano, Venezia",
+    "lat": 45.4332,
+    "lon": 12.3317,
+    "data_inizio": "2026-04-10",
+    "data_fine": "2026-05-08",
+    "visitata": false
   }
 ]
