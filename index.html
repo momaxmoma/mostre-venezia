@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mostre Venezia</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([45.44, 12.33], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+const today = new Date();
+
+function getColor(start, end) {
+  const diffDays = (end - today) / (1000 * 60 * 60 * 24);
+
+  if (today > end) return "red";
+  if (today < start) return "yellow";
+  if (diffDays < 10) return "orange";
+  return "green";
+}
+
+fetch('mostre.json')
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(m => {
+      const start = new Date(m.data_inizio);
+      const end = new Date(m.data_fine);
+
+      const color = getColor(start, end);
+
+      const marker = L.circleMarker([m.lat, m.lon], {
+        radius: 8,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.8
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <b>${m.nome}</b><br>
+        ${m.indirizzo}<br>
+        <b>${m.data_inizio}</b> → <b>${m.data_fine}</b>
+      `);
+    });
+  });
+</script>
+
+</body>
+</html>

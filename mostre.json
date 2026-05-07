@@ -1,0 +1,26 @@
+[
+  {
+    "nome": "Mostra A",
+    "indirizzo": "Dorsoduro 1, Venezia",
+    "lat": 45.431,
+    "lon": 12.328,
+    "data_inizio": "2026-04-01",
+    "data_fine": "2026-05-20"
+  },
+  {
+    "nome": "Mostra B",
+    "indirizzo": "Cannaregio 2000, Venezia",
+    "lat": 45.445,
+    "lon": 12.335,
+    "data_inizio": "2026-05-15",
+    "data_fine": "2026-07-01"
+  },
+  {
+    "nome": "Mostra C",
+    "indirizzo": "San Marco 50, Venezia",
+    "lat": 45.434,
+    "lon": 12.338,
+    "data_inizio": "2026-03-01",
+    "data_fine": "2026-04-15"
+  }
+]
