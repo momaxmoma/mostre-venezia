@@ -194,7 +194,7 @@
       const start = new Date(m.data_inizio);
       const end = new Date(m.data_fine);
 
-      m.visitata = isVisited(m.nome);
+      m.visitata = m.visitata || isVisited(m.nome);
 
       // filtro solo aperte
       if (onlyOpen && !isOpen(start, end)) {
