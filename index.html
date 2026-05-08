@@ -104,9 +104,12 @@
 
   map.tap = true;
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; OpenStreetMap'
+    }
+  ).addTo(map);
 
 
   // =========================
@@ -122,19 +125,55 @@
 
 
   // =========================
-  // LOCAL STORAGE VISITATE
+  // GESTIONE STATO VISITATA
   // =========================
 
-  function isVisited(nome) {
-    return localStorage.getItem(nome) === "visited";
+  function getVisitedState(nome, defaultValue) {
+
+    const value = localStorage.getItem(nome);
+
+    if (value === "visited") {
+      return true;
+    }
+
+    if (value === "unvisited") {
+      return false;
+    }
+
+    return defaultValue;
   }
+
+
+  // =========================
+  // TOGGLE VISITATA
+  // =========================
 
   window.toggleVisited = function(nome) {
 
-    if (isVisited(nome)) {
-      localStorage.removeItem(nome);
+    const mostra = allData.find(
+      m => m.nome === nome
+    );
+
+    const current =
+      getVisitedState(
+        nome,
+        mostra.visitata === true
+      );
+
+    if (current) {
+
+      localStorage.setItem(
+        nome,
+        "unvisited"
+      );
+
     } else {
-      localStorage.setItem(nome, "visited");
+
+      localStorage.setItem(
+        nome,
+        "visited"
+      );
+
     }
 
     renderMarkers();
@@ -146,7 +185,8 @@
   // =========================
 
   function isOpen(start, end) {
-    return today >= start && today <= end;
+    return today >= start &&
+           today <= end;
   }
 
 
@@ -154,14 +194,19 @@
   // COLORE MARKER
   // =========================
 
-  function getColor(visitata, start, end) {
+  function getColor(
+    visited,
+    start,
+    end
+  ) {
 
-    if (visitata) {
+    if (visited) {
       return "blue";
     }
 
     const diffDays =
-      (end - today) / (1000 * 60 * 60 * 24);
+      (end - today) /
+      (1000 * 60 * 60 * 24);
 
     if (today > end) {
       return "red";
@@ -185,7 +230,7 @@
 
   function renderMarkers() {
 
-    // Rimuove marker precedenti
+    // Rimuove marker vecchi
     allMarkers.forEach(marker => {
       map.removeLayer(marker);
     });
@@ -194,38 +239,50 @@
 
     allData.forEach(m => {
 
-      const start = new Date(m.data_inizio);
-      const end = new Date(m.data_fine);
+      const start =
+        new Date(m.data_inizio);
 
-      // Stato visitata corretto:
-      // JSON OR localStorage
+      const end =
+        new Date(m.data_fine);
+
+      // Stato visitata finale
       const visited =
-        m.visitata === true ||
-        isVisited(m.nome);
+        getVisitedState(
+          m.nome,
+          m.visitata === true
+        );
 
       // Filtro solo aperte
-      if (onlyOpen && !isOpen(start, end)) {
+      if (
+        onlyOpen &&
+        !isOpen(start, end)
+      ) {
         return;
       }
 
       const color =
-        getColor(visited, start, end);
+        getColor(
+          visited,
+          start,
+          end
+        );
 
       // =========================
       // MARKER
       // =========================
 
-      const marker = L.circleMarker(
-        [m.lat, m.lon],
-        {
-          radius: 16,
-          weight: 3,
+      const marker =
+        L.circleMarker(
+          [m.lat, m.lon],
+          {
+            radius: 16,
+            weight: 3,
 
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.85
-        }
-      ).addTo(map);
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.85
+          }
+        ).addTo(map);
 
 
       // =========================
@@ -245,7 +302,9 @@
           </div>
 
           <div class="popup-line">
-            📅 ${m.data_inizio} → ${m.data_fine}
+            📅 ${m.data_inizio}
+            →
+            ${m.data_fine}
           </div>
 
           <div class="popup-line">
@@ -277,7 +336,7 @@
 
 
   // =========================
-  // CARICAMENTO JSON
+  // CARICA JSON
   // =========================
 
   fetch(
@@ -388,12 +447,11 @@
   filterControl.addTo(map);
 
 
-  // =========================
-  // BLOCCA EVENTI MAPPA
-  // =========================
-
+  // Blocca eventi mappa
   const filterBox =
-    document.querySelector('.filter-box');
+    document.querySelector(
+      '.filter-box'
+    );
 
   L.DomEvent.disableClickPropagation(
     filterBox
@@ -404,10 +462,7 @@
   );
 
 
-  // =========================
-  // EVENTO CHECKBOX
-  // =========================
-
+  // Evento checkbox
   document.addEventListener(
     'change',
     function(e) {
