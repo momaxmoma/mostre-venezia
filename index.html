@@ -52,6 +52,7 @@
       background: #1976d2;
       color: white;
       cursor: pointer;
+      width: 100%;
     }
 
     /* Legenda */
@@ -109,7 +110,7 @@
 
 
   // =========================
-  // DATA ODIERNA
+  // VARIABILI GLOBALI
   // =========================
 
   const today = new Date();
@@ -121,7 +122,36 @@
 
 
   // =========================
-  // COLORI
+  // STATO VISITATA
+  // =========================
+
+  function isVisited(nome) {
+    return localStorage.getItem(nome) === "visited";
+  }
+
+  window.toggleVisited = function(nome) {
+
+    if (isVisited(nome)) {
+      localStorage.removeItem(nome);
+    } else {
+      localStorage.setItem(nome, "visited");
+    }
+
+    renderMarkers();
+  }
+
+
+  // =========================
+  // MOSTRA APERTA?
+  // =========================
+
+  function isOpen(start, end) {
+    return today >= start && today <= end;
+  }
+
+
+  // =========================
+  // COLORE MARKER
   // =========================
 
   function getColor(mostra, start, end) {
@@ -149,41 +179,12 @@
 
 
   // =========================
-  // VISITATA
-  // =========================
-
-  function isVisited(nome) {
-    return localStorage.getItem(nome) === "visited";
-  }
-
-  function toggleVisited(nome) {
-
-    if (isVisited(nome)) {
-      localStorage.removeItem(nome);
-    } else {
-      localStorage.setItem(nome, "visited");
-    }
-
-    renderMarkers();
-  }
-
-
-  // =========================
-  // FILTRO APERTE
-  // =========================
-
-  function isOpen(start, end) {
-    return today >= start && today <= end;
-  }
-
-
-  // =========================
-  // RENDER MARKERS
+  // RENDER MARKER
   // =========================
 
   function renderMarkers() {
 
-    // Rimuove marker vecchi
+    // Rimuove marker esistenti
     allMarkers.forEach(marker => map.removeLayer(marker));
 
     allMarkers = [];
@@ -195,7 +196,7 @@
 
       m.visitata = isVisited(m.nome);
 
-      // Filtro solo aperte
+      // filtro solo aperte
       if (onlyOpen && !isOpen(start, end)) {
         return;
       }
@@ -213,6 +214,10 @@
 
       }).addTo(map);
 
+
+      // =========================
+      // POPUP
+      // =========================
 
       marker.bindPopup(`
 
@@ -236,7 +241,7 @@
 
           <button
             class="visit-btn"
-            onclick="toggleVisited('${m.nome}')"
+            onclick="toggleVisited('${m.nome.replace(/'/g, "\\'")}')"
           >
             ${m.visitata ? 'Rimuovi visitata' : 'Segna visitata'}
           </button>
@@ -255,7 +260,7 @@
 
 
   // =========================
-  // CARICAMENTO JSON
+  // CARICA JSON
   // =========================
 
   fetch('mostre.json?v=' + new Date().getTime())
@@ -302,7 +307,7 @@
 
 
   // =========================
-  // FILTRO "SOLO APERTE"
+  // FILTRO SOLO APERTE
   // =========================
 
   const filterControl = L.control({ position: 'topright' });
@@ -326,20 +331,25 @@
   filterControl.addTo(map);
 
 
-  // Aspetta che il checkbox esista
-  setTimeout(() => {
+  // Blocca interazioni mappa sul pannello
+  const filterBox = document.querySelector('.filter-box');
 
-    document
-      .getElementById('openFilter')
-      .addEventListener('change', function(e) {
+  L.DomEvent.disableClickPropagation(filterBox);
+  L.DomEvent.disableScrollPropagation(filterBox);
 
-        onlyOpen = e.target.checked;
 
-        renderMarkers();
+  // Listener filtro
+  document.addEventListener('change', function(e) {
 
-      });
+    if (e.target && e.target.id === 'openFilter') {
 
-  }, 500);
+      onlyOpen = e.target.checked;
+
+      renderMarkers();
+
+    }
+
+  });
 
 </script>
 
