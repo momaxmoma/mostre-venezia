@@ -3,8 +3,6 @@
 
 <head>
   <meta charset="utf-8" />
-
-  <!-- IMPORTANTISSIMO per mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Mostre Venezia</title>
@@ -12,10 +10,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
   <style>
+
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      font-family: Arial, sans-serif;
     }
 
     #map {
@@ -23,7 +23,8 @@
       width: 100vw;
     }
 
-    /* Popup mobile-friendly */
+    /* Popup */
+
     .leaflet-popup-content {
       margin: 12px 16px;
       font-size: 18px;
@@ -40,13 +41,27 @@
       margin-bottom: 8px;
     }
 
+    /* Pulsante visitata */
+
+    .visit-btn {
+      margin-top: 12px;
+      padding: 10px 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1976d2;
+      color: white;
+      cursor: pointer;
+    }
+
     /* Legenda */
+
     .legend {
       background: white;
       padding: 12px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.25);
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.7;
     }
 
@@ -58,6 +73,17 @@
       margin-right: 8px;
       vertical-align: middle;
     }
+
+    /* Filtro */
+
+    .filter-box {
+      background: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
+      font-size: 16px;
+    }
+
   </style>
 </head>
 
@@ -75,7 +101,6 @@
 
   const map = L.map('map').setView([45.44, 12.33], 13);
 
-  // Migliora touch mobile
   map.tap = true;
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -89,6 +114,11 @@
 
   const today = new Date();
 
+  let allData = [];
+  let allMarkers = [];
+
+  let onlyOpen = false;
+
 
   // =========================
   // COLORI
@@ -96,37 +126,136 @@
 
   function getColor(mostra, start, end) {
 
-    // Visitata
     if (mostra.visitata) {
       return "blue";
     }
 
-    // Giorni mancanti alla chiusura
     const diffDays = (end - today) / (1000 * 60 * 60 * 24);
 
-    // Chiusa
     if (today > end) {
       return "red";
     }
 
-    // Futura
     if (today < start) {
       return "yellow";
     }
 
-    // In chiusura
     if (diffDays < 10) {
       return "orange";
     }
 
-    // Aperta
     return "green";
   }
 
 
   // =========================
+  // VISITATA
+  // =========================
+
+  function isVisited(nome) {
+    return localStorage.getItem(nome) === "visited";
+  }
+
+  function toggleVisited(nome) {
+
+    if (isVisited(nome)) {
+      localStorage.removeItem(nome);
+    } else {
+      localStorage.setItem(nome, "visited");
+    }
+
+    renderMarkers();
+  }
+
+
+  // =========================
+  // FILTRO APERTE
+  // =========================
+
+  function isOpen(start, end) {
+    return today >= start && today <= end;
+  }
+
+
+  // =========================
+  // RENDER MARKERS
+  // =========================
+
+  function renderMarkers() {
+
+    // Rimuove marker vecchi
+    allMarkers.forEach(marker => map.removeLayer(marker));
+
+    allMarkers = [];
+
+    allData.forEach(m => {
+
+      const start = new Date(m.data_inizio);
+      const end = new Date(m.data_fine);
+
+      m.visitata = isVisited(m.nome);
+
+      // Filtro solo aperte
+      if (onlyOpen && !isOpen(start, end)) {
+        return;
+      }
+
+      const color = getColor(m, start, end);
+
+      const marker = L.circleMarker([m.lat, m.lon], {
+
+        radius: 16,
+        weight: 3,
+
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.85
+
+      }).addTo(map);
+
+
+      marker.bindPopup(`
+
+        <div style="min-width:250px;">
+
+          <div class="popup-title">
+            ${m.nome}
+          </div>
+
+          <div class="popup-line">
+            📍 ${m.indirizzo}
+          </div>
+
+          <div class="popup-line">
+            📅 ${m.data_inizio} → ${m.data_fine}
+          </div>
+
+          <div class="popup-line">
+            ${m.visitata ? '✅ Visitata' : '🆕 Non visitata'}
+          </div>
+
+          <button
+            class="visit-btn"
+            onclick="toggleVisited('${m.nome}')"
+          >
+            ${m.visitata ? 'Rimuovi visitata' : 'Segna visitata'}
+          </button>
+
+        </div>
+
+      `, {
+        maxWidth: 320
+      });
+
+      allMarkers.push(marker);
+
+    });
+
+  }
+
+
+  // =========================
   // CARICAMENTO JSON
-  // Anti-cache con timestamp
   // =========================
 
   fetch('mostre.json?v=' + new Date().getTime())
@@ -135,62 +264,9 @@
 
     .then(data => {
 
-      data.forEach(m => {
+      allData = data;
 
-        const start = new Date(m.data_inizio);
-        const end = new Date(m.data_fine);
-
-        const color = getColor(m, start, end);
-
-        // =========================
-        // MARKER GRANDI MOBILE
-        // =========================
-
-        const marker = L.circleMarker([m.lat, m.lon], {
-
-          radius: 10,
-          weight: 3,
-
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.85
-
-        }).addTo(map);
-
-
-        // =========================
-        // POPUP GRANDE
-        // =========================
-
-        marker.bindPopup(`
-
-          <div style="min-width:250px;">
-
-            <div class="popup-title">
-              ${m.nome}
-            </div>
-
-            <div class="popup-line">
-              📍 ${m.indirizzo}
-            </div>
-
-            <div class="popup-line">
-              📅 ${m.data_inizio} → ${m.data_fine}
-            </div>
-
-            <div class="popup-line">
-              ${m.visitata ? '✅ Visitata' : '🆕 Non visitata'}
-            </div>
-
-          </div>
-
-        `, {
-
-          maxWidth: 320
-
-        });
-
-      });
+      renderMarkers();
 
     });
 
@@ -223,6 +299,47 @@
   };
 
   legend.addTo(map);
+
+
+  // =========================
+  // FILTRO "SOLO APERTE"
+  // =========================
+
+  const filterControl = L.control({ position: 'topright' });
+
+  filterControl.onAdd = function () {
+
+    const div = L.DomUtil.create('div', 'filter-box');
+
+    div.innerHTML = `
+
+      <label>
+        <input type="checkbox" id="openFilter">
+        Solo aperte
+      </label>
+
+    `;
+
+    return div;
+  };
+
+  filterControl.addTo(map);
+
+
+  // Aspetta che il checkbox esista
+  setTimeout(() => {
+
+    document
+      .getElementById('openFilter')
+      .addEventListener('change', function(e) {
+
+        onlyOpen = e.target.checked;
+
+        renderMarkers();
+
+      });
+
+  }, 500);
 
 </script>
 
