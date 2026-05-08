@@ -122,7 +122,7 @@
 
 
   // =========================
-  // STATO VISITATA
+  // LOCAL STORAGE VISITATE
   // =========================
 
   function isVisited(nome) {
@@ -154,13 +154,14 @@
   // COLORE MARKER
   // =========================
 
-  function getColor(mostra, start, end) {
+  function getColor(visitata, start, end) {
 
-    if (mostra.visitata) {
+    if (visitata) {
       return "blue";
     }
 
-    const diffDays = (end - today) / (1000 * 60 * 60 * 24);
+    const diffDays =
+      (end - today) / (1000 * 60 * 60 * 24);
 
     if (today > end) {
       return "red";
@@ -184,8 +185,10 @@
 
   function renderMarkers() {
 
-    // Rimuove marker esistenti
-    allMarkers.forEach(marker => map.removeLayer(marker));
+    // Rimuove marker precedenti
+    allMarkers.forEach(marker => {
+      map.removeLayer(marker);
+    });
 
     allMarkers = [];
 
@@ -194,25 +197,35 @@
       const start = new Date(m.data_inizio);
       const end = new Date(m.data_fine);
 
-      m.visitata = m.visitata || isVisited(m.nome);
+      // Stato visitata corretto:
+      // JSON OR localStorage
+      const visited =
+        m.visitata === true ||
+        isVisited(m.nome);
 
-      // filtro solo aperte
+      // Filtro solo aperte
       if (onlyOpen && !isOpen(start, end)) {
         return;
       }
 
-      const color = getColor(m, start, end);
+      const color =
+        getColor(visited, start, end);
 
-      const marker = L.circleMarker([m.lat, m.lon], {
+      // =========================
+      // MARKER
+      // =========================
 
-        radius: 16,
-        weight: 3,
+      const marker = L.circleMarker(
+        [m.lat, m.lon],
+        {
+          radius: 16,
+          weight: 3,
 
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.85
-
-      }).addTo(map);
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.85
+        }
+      ).addTo(map);
 
 
       // =========================
@@ -236,14 +249,18 @@
           </div>
 
           <div class="popup-line">
-            ${m.visitata ? '✅ Visitata' : '🆕 Non visitata'}
+            ${visited
+              ? '✅ Visitata'
+              : '🆕 Non visitata'}
           </div>
 
           <button
             class="visit-btn"
             onclick="toggleVisited('${m.nome.replace(/'/g, "\\'")}')"
           >
-            ${m.visitata ? 'Rimuovi visitata' : 'Segna visitata'}
+            ${visited
+              ? 'Rimuovi visitata'
+              : 'Segna visitata'}
           </button>
 
         </div>
@@ -260,10 +277,13 @@
 
 
   // =========================
-  // CARICA JSON
+  // CARICAMENTO JSON
   // =========================
 
-  fetch('mostre.json?v=' + new Date().getTime())
+  fetch(
+    'mostre.json?v=' +
+    new Date().getTime()
+  )
 
     .then(res => res.json())
 
@@ -280,23 +300,50 @@
   // LEGENDA
   // =========================
 
-  const legend = L.control({ position: 'bottomright' });
+  const legend =
+    L.control({
+      position: 'bottomright'
+    });
 
   legend.onAdd = function () {
 
-    const div = L.DomUtil.create('div', 'legend');
+    const div =
+      L.DomUtil.create(
+        'div',
+        'legend'
+      );
 
     div.innerHTML = `
 
-      <div><span class="legend-color" style="background:green"></span> Aperta</div>
+      <div>
+        <span class="legend-color"
+          style="background:green"></span>
+        Aperta
+      </div>
 
-      <div><span class="legend-color" style="background:orange"></span> In chiusura (&lt;10 gg)</div>
+      <div>
+        <span class="legend-color"
+          style="background:orange"></span>
+        In chiusura (&lt;10 gg)
+      </div>
 
-      <div><span class="legend-color" style="background:yellow"></span> Futura</div>
+      <div>
+        <span class="legend-color"
+          style="background:yellow"></span>
+        Futura
+      </div>
 
-      <div><span class="legend-color" style="background:red"></span> Chiusa</div>
+      <div>
+        <span class="legend-color"
+          style="background:red"></span>
+        Chiusa
+      </div>
 
-      <div><span class="legend-color" style="background:blue"></span> Visitata</div>
+      <div>
+        <span class="legend-color"
+          style="background:blue"></span>
+        Visitata
+      </div>
 
     `;
 
@@ -310,16 +357,26 @@
   // FILTRO SOLO APERTE
   // =========================
 
-  const filterControl = L.control({ position: 'topright' });
+  const filterControl =
+    L.control({
+      position: 'topright'
+    });
 
   filterControl.onAdd = function () {
 
-    const div = L.DomUtil.create('div', 'filter-box');
+    const div =
+      L.DomUtil.create(
+        'div',
+        'filter-box'
+      );
 
     div.innerHTML = `
 
       <label>
-        <input type="checkbox" id="openFilter">
+        <input
+          type="checkbox"
+          id="openFilter"
+        >
         Solo aperte
       </label>
 
@@ -331,25 +388,44 @@
   filterControl.addTo(map);
 
 
-  // Blocca interazioni mappa sul pannello
-  const filterBox = document.querySelector('.filter-box');
+  // =========================
+  // BLOCCA EVENTI MAPPA
+  // =========================
 
-  L.DomEvent.disableClickPropagation(filterBox);
-  L.DomEvent.disableScrollPropagation(filterBox);
+  const filterBox =
+    document.querySelector('.filter-box');
+
+  L.DomEvent.disableClickPropagation(
+    filterBox
+  );
+
+  L.DomEvent.disableScrollPropagation(
+    filterBox
+  );
 
 
-  // Listener filtro
-  document.addEventListener('change', function(e) {
+  // =========================
+  // EVENTO CHECKBOX
+  // =========================
 
-    if (e.target && e.target.id === 'openFilter') {
+  document.addEventListener(
+    'change',
+    function(e) {
 
-      onlyOpen = e.target.checked;
+      if (
+        e.target &&
+        e.target.id === 'openFilter'
+      ) {
 
-      renderMarkers();
+        onlyOpen =
+          e.target.checked;
+
+        renderMarkers();
+
+      }
 
     }
-
-  });
+  );
 
 </script>
 
