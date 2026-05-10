@@ -271,37 +271,17 @@
         ).addTo(map);
 
 
-      // =========================
-      // POPUP
-      // =========================
+// =========================
+// POPUP
+// =========================
 
-      marker.bindPopup(`
+// Pulsante visitata:
+// nascosto per mostre future
+let visitButton = '';
 
-        <div style="min-width:250px;">
+if (today >= start) {
 
-          <div class="popup-title">
-            ${m.nome}
-          </div>
-
-          <div class="popup-line">
-            📍 ${m.indirizzo}
-          </div>
-
-          <div class="popup-line">
-            📅 ${m.data_inizio}
-            →
-            ${m.data_fine}
-          </div>
-
-          <div class="popup-line">
-            ${visited
-              ? '✅ Visitata'
-              : '🆕 Non visitata'}
-          </div>
-
-${
-  today >= start
-  ? `
+  visitButton = `
     <button
       class="visit-btn"
       onclick="toggleVisited('${m.nome.replace(/'/g, "\\'")}')"
@@ -310,17 +290,42 @@ ${
         ? 'Rimuovi visitata'
         : 'Segna visitata'}
     </button>
-  `
-  : ''
+  `;
 }
 
-        </div>
+marker.bindPopup(`
 
-      `, {
-        maxWidth: 320
-      });
+  <div style="min-width:250px;">
 
-      allMarkers.push(marker);
+    <div class="popup-title">
+      ${m.nome}
+    </div>
+
+    <div class="popup-line">
+      📍 ${m.indirizzo}
+    </div>
+
+    <div class="popup-line">
+      📅 ${m.data_inizio}
+      →
+      ${m.data_fine}
+    </div>
+
+    <div class="popup-line">
+      ${visited
+        ? '✅ Visitata'
+        : '🆕 Non visitata'}
+    </div>
+
+    ${visitButton}
+
+  </div>
+
+`, {
+  maxWidth: 320
+});
+
+allMarkers.push(marker);
 
     });
 
