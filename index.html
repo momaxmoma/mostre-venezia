@@ -125,22 +125,23 @@
 
 
   // =========================
-  // GESTIONE STATO VISITATA
+  // STATO VISITATA
   // =========================
 
-  function getVisitedState(nome, defaultValue) {
+  function getVisitedState(mostra) {
 
-    const value = localStorage.getItem(nome);
+    const override =
+      localStorage.getItem(
+        "visited_" + mostra.nome
+      );
 
-    if (value === "visited") {
-      return true;
+    // override locale
+    if (override !== null) {
+      return override === "true";
     }
 
-    if (value === "unvisited") {
-      return false;
-    }
-
-    return defaultValue;
+    // valore iniziale JSON
+    return mostra.visitata === true;
   }
 
 
@@ -150,31 +151,18 @@
 
   window.toggleVisited = function(nome) {
 
-    const mostra = allData.find(
-      m => m.nome === nome
-    );
+    const mostra =
+      allData.find(
+        m => m.nome === nome
+      );
 
     const current =
-      getVisitedState(
-        nome,
-        mostra.visitata === true
-      );
+      getVisitedState(mostra);
 
-    if (current) {
-
-      localStorage.setItem(
-        nome,
-        "unvisited"
-      );
-
-    } else {
-
-      localStorage.setItem(
-        nome,
-        "visited"
-      );
-
-    }
+    localStorage.setItem(
+      "visited_" + nome,
+      (!current).toString()
+    );
 
     renderMarkers();
   }
@@ -185,6 +173,7 @@
   // =========================
 
   function isOpen(start, end) {
+
     return today >= start &&
            today <= end;
   }
@@ -225,7 +214,7 @@
 
 
   // =========================
-  // RENDER MARKER
+  // RENDER MARKERS
   // =========================
 
   function renderMarkers() {
@@ -245,14 +234,11 @@
       const end =
         new Date(m.data_fine);
 
-      // Stato visitata finale
+      // stato visitata finale
       const visited =
-        getVisitedState(
-          m.nome,
-          m.visitata === true
-        );
+        getVisitedState(m);
 
-      // Filtro solo aperte
+      // filtro solo aperte
       if (
         onlyOpen &&
         !isOpen(start, end)
@@ -447,7 +433,10 @@
   filterControl.addTo(map);
 
 
-  // Blocca eventi mappa
+  // =========================
+  // BLOCCA EVENTI MAPPA
+  // =========================
+
   const filterBox =
     document.querySelector(
       '.filter-box'
@@ -462,7 +451,10 @@
   );
 
 
-  // Evento checkbox
+  // =========================
+  // EVENTO CHECKBOX
+  // =========================
+
   document.addEventListener(
     'change',
     function(e) {
