@@ -299,14 +299,20 @@
               : '🆕 Non visitata'}
           </div>
 
-          <button
-            class="visit-btn"
-            onclick="toggleVisited('${m.nome.replace(/'/g, "\\'")}')"
-          >
-            ${visited
-              ? 'Rimuovi visitata'
-              : 'Segna visitata'}
-          </button>
+${
+  today >= start
+  ? `
+    <button
+      class="visit-btn"
+      onclick="toggleVisited('${m.nome.replace(/'/g, "\\'")}')"
+    >
+      ${visited
+        ? 'Rimuovi visitata'
+        : 'Segna visitata'}
+    </button>
+  `
+  : ''
+}
 
         </div>
 
